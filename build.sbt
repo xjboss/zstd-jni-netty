@@ -43,7 +43,9 @@ jniNativeClasses := Seq(
   "com.github.luben.zstd.ZstdOutputStream",
   "com.github.luben.zstd.ZstdInputStream",
   "com.github.luben.zstd.ZstdDirectBufferDecompressingStream",
-  "com.github.luben.zstd.ZstdDirectBufferCompressingStream"
+  "com.github.luben.zstd.ZstdDirectBufferCompressingStream",
+  "com.github.luben.zstd.ZstdDirectDecompressingStream",
+  "com.github.luben.zstd.ZstdDirectCompressingStream"
 )
 
 jniLibSuffix := (System.getProperty("os.name").toLowerCase match {
