@@ -10,7 +10,7 @@ public class ZstdDictTrainer {
     private final List<Integer> sampleSizes;
     private final int dictSize;
     private long filledSize;
-
+    private final Object putObj = new Object();
     public ZstdDictTrainer(int sampleSize, int dictSize) {
         trainingSamples = ByteBuffer.allocateDirect(sampleSize);
         sampleSizes =  new ArrayList<Integer>();
@@ -18,14 +18,29 @@ public class ZstdDictTrainer {
         this.dictSize = dictSize;
     }
 
-    public synchronized boolean addSample(byte[] sample) {
-        if (filledSize + sample.length > allocatedSize) {
-            return false;
+    public boolean addSample(byte[] sample) {
+        synchronized (putObj) {
+            if (filledSize + sample.length > allocatedSize) {
+                return false;
+            }
+            trainingSamples.put(sample);
+            sampleSizes.add(sample.length);
+            filledSize += sample.length;
+            return true;
         }
-        trainingSamples.put(sample);
-        sampleSizes.add(sample.length);
-        filledSize += sample.length;
-        return true;
+    }
+
+    public boolean addSample(ByteBuffer sample) {
+        synchronized (putObj) {
+            int size = sample.remaining();
+            if (filledSize + size > allocatedSize) {
+                return false;
+            }
+            trainingSamples.put(sample);
+            sampleSizes.add(size);
+            filledSize += size;
+            return true;
+        }
     }
 
     public ByteBuffer trainSamplesDirect() throws ZstdException {
